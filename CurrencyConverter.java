@@ -1,5 +1,7 @@
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,7 +49,7 @@ public class CurrencyConverter implements ActionListener{
 		label2 = new JLabel();
 		label2.setHorizontalAlignment(JLabel.LEFT);
 		label2.setSize(400, 100);
-		label2.setText("Enter the USD amount you wish to convert");
+		label2.setText("Enter the USD amount you wish to convert:    $");
 		
 		
 		JButton b1 = new JButton("Convert");
@@ -60,18 +62,18 @@ public class CurrencyConverter implements ActionListener{
 		
 		
 		
-		String[] currencies = {"Euro", "GBP", "Yen", "Yuan", "Peso", "Ruble", "Franc", "Bitcoin"}; 
+		String[] currencies = {"Bitcoin", "Euro", "Franc", "GBP", "Lira", "Peso", "Ruble", "Rupee", "Won", "Yen", "Yuan"}; 
 		cb = new JComboBox(currencies);
 		cb.setBounds(200, 200, 150, 50);
-		frame.add(cb);
-		frame.add(b1);
 		frame.add(label2);
 		frame.add(tf);
+		frame.add(cb);
+		frame.add(b1);
 		frame.add(label1);
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(800, 600);
-		frame.setLayout(new FlowLayout()); //see what happens when you set to "flow" instead of null
+		frame.setLayout(new FlowLayout()); 
 		frame.setVisible(true);
 		
 		
@@ -82,8 +84,18 @@ public class CurrencyConverter implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		try {
 		String userChoice = (String) cb.getItemAt(cb.getSelectedIndex());
-		double amountInput = Double.parseDouble(tf.getText());
-		String s = formatMessage(userChoice, amountInput);
+		String amountInput = tf.getText();
+		String newString = "";
+		
+		for(int i = 0; i < amountInput.length(); i++) {
+			if(amountInput.charAt(i) == ',' || amountInput.charAt(i) == '$') {
+				continue;
+			}
+			newString = newString + amountInput.charAt(i);
+		}
+		
+		double amountInputDouble = Double.parseDouble(newString);
+		String s = formatMessage(userChoice, amountInputDouble);
 		label1.setText(s);
 		} 
 		catch(NumberFormatException ex) {
@@ -154,48 +166,38 @@ public class CurrencyConverter implements ActionListener{
 			currencySymbol = "\u20bf";
 			break;
 			
+		case "Won":
+			rate = 1354.61;
+			currencyName = "South Korean Won";
+			currencySymbol = "\u20a9";
+			break;
+			
+		case "Rupee":
+			rate = 88.33;
+			currencyName = "Indian Rupee";
+			currencySymbol = "\uu20a8";
+			break;
+			
+		case "Lira":
+			rate = 32.16;
+			currencyName = "Turkish Lira";
+			currencySymbol = "\u20a4";
+			break;
+			
 			
 		default:
 			return "Invalid entry";
 
 		}
         
-        String dollarAmount = Double.toString(amount);
-        String convertedAmount = Double.toString(amount * rate);
+        double amountRounded = Math.round(amount * 100) / 100.00;
+        double convertedAmountRounded = Math.round(amount * rate * 100) / 100.00;
+        String dollarAmount = Double.toString(amountRounded); 
+        String convertedAmount = Double.toString(convertedAmountRounded);
         
         
         
-        try {
-        	
-            String leftSide = "";
-            String rightSide = "";
-            
-            for(int i = 0; i < dollarAmount.length() - 1 || dollarAmount.charAt(i) == '.'; i++) {
-            	if(dollarAmount.charAt(i) == '.') {
-        	    	leftSide = dollarAmount.substring(0,i);
-        	    	rightSide = dollarAmount.substring(i, i + 3);
-        	    }
-            }
-            	
-            
-            leftSide = "";
-            rightSide = "";
-            
-            for(int i = 0; i < convertedAmount.length() - 1 || convertedAmount.charAt(i) == '.'; i++) {
-            	if(convertedAmount.charAt(i) == '.') {
-        	    	leftSide = convertedAmount.substring(0,i);
-        	    	rightSide = convertedAmount.substring(i, i + 3);
-        	    }
-        }
-        convertedAmount = leftSide + rightSide;
-        }
-        catch(Exception e) {
-        	
-        }
-        
-        String returnString = "$" + dollarAmount + " in " + currencyName + " is " + currencySymbol + convertedAmount;
-        
-        return returnString;
+        return "$" + dollarAmount + " in " + currencyName + " is " + currencySymbol + convertedAmount; 
 }
 
 
@@ -204,6 +206,7 @@ public class CurrencyConverter implements ActionListener{
 	public static void main(String[] args) {
 		
 		new CurrencyConverter();
+		
 	}
 	
 }
